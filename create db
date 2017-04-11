@@ -3,4 +3,4 @@ psql
 create database dbname;
 create user user_name with password 'user_password'
 grant all privileges on database dbname to user_name;
-psql -U user_name -h localhost  dbname
+psql -U user_name -h localhost -d dbname
