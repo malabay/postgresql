@@ -1,3 +1,39 @@
+/*EXEC SQL BEGIN DECLARE SECTION;
+const char *stmt = "CREATE TABLE test1 (id int,txt varchar(100));";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL EXECUTE IMMEDIATE :stmt;*/
+--CREATE TABLE test1 (id int,txt varchar(100));
+--DROP TABLE test1-- (id int,txt varchar(100));
+--execute 'CREATE TABLE test1 (id int,txt varchar(100));'
+--xecute 'select  1'
+--CREATE TABLE ct(id SERIAL, rowid TEXT, attribute TEXT, value TEXT);
+--select * from ct;
+--SELECT * FROM normal_rand(1000, 5, 3);
+--stmt_str := 'TRUNCATE TABLE ct';
+--EXECUTE IMMEDIATE stmt_str;
+/*
+select table_catalog::text, 
+                               table_schema::text, 
+                               table_name::text 
+                          from information_schema.tables*/
+/*
+select t.* 
+  from doSelect(format('select table_catalog::text, 
+                               table_schema::text, 
+                               table_name::text, 
+                               (select 1 union all select 2)::text as id
+                          from %s 
+                         where table_schema=$1 limit $2::bigint', 
+                       'information_schema.tables'), 'public',1::text) 
+         as t(table_catalog text, table_schema text, table_name text,table_id text) ;*/
+/*select table_catalog::text, 
+                               table_schema::text, 
+                               table_name::text, 
+                               '1'::text id1 
+                              ,'2'::text id2 
+                          from information_schema.tables 
+                         where table_schema='public' limit 1*/
 --truncate table  client_info                        
 --create table client_info(client_id int ,param varchar(100),value varchar(100))
 /*
@@ -72,13 +108,8 @@ select 'create or replace view v_client_info  as select client_id,'||array_to_st
                       ) t 
                ),','
         )||'from client_info group by  client_id' as user_query*/
-
-do $$
-declare
-  r record;
-  
-begin
-   FOR r IN select 'create or replace view v_client_info  as select client_id,'||array_to_string
+/*
+   select 'create or replace view v_client_info  as select client_id,'||array_to_string
         (array (select 'max(case when param ='''||t.param||''' then value end)  as '|| t.param
                   from 
                       (
@@ -86,17 +117,58 @@ begin
                         from client_info 
                       ) t 
                ),','
-        )||'from client_info group by  client_id' as user_query
+        )||'from client_info group by  client_id'
+  */      
+/*
+ select 'create or replace view v_client_info  as select 1 
+ union all
+ select 2' */
+
+do $$
+declare
+  r record;
+  v_text text ;
+begin
+   select a.text_query from
+  (select 'drop view v_client_info; create or replace view v_client_info  as select client_id,'||array_to_string
+        (array (select 'max(case when param ='''||t.param||''' then value end)  as '|| t.param
+                  from 
+                      (
+                       select distinct param as param 
+                        from client_info 
+                      ) t 
+               ),','
+        )||' from client_info group by  client_id;' as text_query) a  into v_text;
+   FOR r IN select 1 as id
         loop
-         execute ''||r.user_query;
+         execute v_text;
         end loop;  
 end;
 $$ language plpgsql;
+
+select * from v_client_info
+        
+/*
+create or replace view v_client_info  as select client_id,'||array_to_string
+        (array (select 'max(case when param ='''||t.param||''' then value end)  as '|| t.param
+                  from 
+                      (
+                       select distinct param as param 
+                        from client_info 
+                      ) t 
+               ),','
+        )||'from client_info group by  client_id*/
+--select * from v_client_info
+--drop view v_client_info ;
+--create view v_client_info  as (select 1)
 --select * from v_client_info
 --select * from doSelect('create view v_tmp as select 1 as id') as t(id int) ;
 
 --SELECT client_id FROM client_info limit 1
 
+--EXEC SQL CLOSE cursor1;
 
 --select ''''||array_to_string(array (select distinct param from client_info order by 1),''',''')||''''
+
+
 
