@@ -1,0 +1,2 @@
+Список расширений https://www.postgresql.org/docs/9.5/static/contrib.html
+create extension name_extension -- Выполняется скрипт из /usr/share/postgresql/9.5/extension
