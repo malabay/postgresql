@@ -1,0 +1,5 @@
+#ubuntu 16.04 64 bit
+sudo systemctl stop postgresql
+sudo systemctl status postgresql
+sudo rsync -av /var/lib/postgresql /mnt/volume-nyc1-01
+sudo mv /var/lib/postgresql/9.5/main /var/lib/postgresql/9.5/main.bak
