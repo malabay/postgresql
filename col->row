@@ -1,0 +1,102 @@
+--truncate table  client_info                        
+--create table client_info(client_id int ,param varchar(100),value varchar(100))
+/*
+insert into client_info values(1,'phone','123');
+insert into client_info values(1,'email','123@ru');
+insert into client_info values(1,'address','Lenina,123');
+insert into client_info values(1,'heigth','123');
+insert into client_info values(2,'phone','223');
+insert into client_info values(2,'email','223@ru');
+insert into client_info values(2,'address','Lenina,223');*/
+
+/*
+select 'create or replace view v_client_info  as select client_id,'||array_to_string
+        (array (select 'max(case when param ='''||t.param||''' then value end)  as '|| t.param
+                  from 
+                      (
+                       select distinct param as param 
+                        from client_info 
+                      ) t 
+               ),','
+        )||'from client_info group by  client_id' as user_query
+*/        
+--select * from v_client_info        
+/*
+create or replace view v_client_info
+as 
+select client_id
+       ,max(case when param = 'phone' then value end)  as phone
+       ,max(case when param = 'email' then value end ) as email
+       ,max(case when param = 'address' then value end)  as address
+       ,max(case when param = 'heigth' then value end ) as heigth
+  from client_info
+ group by  client_id*/
+ --select * from  v_client_info
+ 
+
+--select * from information_schema.tables where table_name like 'client_info'
+--select * from information_schema.columns where table_name like 'client_info'
+
+
+         
+ 
+
+/*
+SELECT *
+FROM crosstab(
+  'select  value, rowid,attribute
+   from ct
+ 
+   order by 1')
+   */
+
+   
+--AS ct(row_name text, category_1 text, category_2 text, category_3 text);
+--select * from doSelect('select relname::text from pg_class') as ds(name text) where name='aa'
+/*
+create or replace function doSelect(query text) returns setof record as
+$code$
+begin
+  return query execute query;
+end;
+$code$
+language plpgsql
+*/
+/*
+select 'create or replace view v_client_info  as select client_id,'||array_to_string
+        (array (select 'max(case when param ='''||t.param||''' then value end)  as '|| t.param
+                  from 
+                      (
+                       select distinct param as param 
+                        from client_info 
+                      ) t 
+               ),','
+        )||'from client_info group by  client_id' as user_query*/
+
+do $$
+declare
+  r record;
+  
+begin
+   FOR r IN select 'create or replace view v_client_info  as select client_id,'||array_to_string
+        (array (select 'max(case when param ='''||t.param||''' then value end)  as '|| t.param
+                  from 
+                      (
+                       select distinct param as param 
+                        from client_info 
+                      ) t 
+               ),','
+        )||'from client_info group by  client_id' as user_query
+        loop
+         execute ''||r.user_query;
+        end loop;  
+end;
+$$ language plpgsql;
+--select * from v_client_info
+--select * from doSelect('create view v_tmp as select 1 as id') as t(id int) ;
+
+--SELECT client_id FROM client_info limit 1
+
+
+--select ''''||array_to_string(array (select distinct param from client_info order by 1),''',''')||''''
+
